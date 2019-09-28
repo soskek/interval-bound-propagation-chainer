@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 import argparse
+import collections
 
 import numpy as np
 import chainer
 import chainer.functions as F
 import chainer.links as L
+from chainer import cuda
 from chainer import training
 from chainer.training import extensions
 import chainerx
 
 from layers import verifiable_relu, VerifiableLinear, VerifiableConvolution2D
-# , VerifiableLinearWithXEntLoss
 
 # initializer = chainer.initializers.Orthogonal(scale=1.0)
 # This doesn't work sometimes
@@ -177,6 +178,77 @@ class VerifiableClassifier(chainer.Chain):
             {'kappa': self.normal_loss_weight}, self)
         chainer.reporter.report(
             {'eps': self.epsilon}, self)
+
+
+class SmallerCNN4Visualization(VerifiableClassifier):
+
+    def __init__(self, n_class, verify=False,
+                 warmup_steps=2000,
+                 rampup_steps=10000,
+                 normal_loss_weight=0.5,
+                 epsilon=0.1):
+        super(SmallerCNN4Visualization, self).__init__(
+            n_class, verify=verify,
+            warmup_steps=warmup_steps, rampup_steps=rampup_steps,
+            normal_loss_weight=normal_loss_weight, epsilon=epsilon)
+
+        with self.init_scope():
+            self.l1 = self._Convolution2D(
+                None, out_channels=6, ksize=(5, 5), stride=2, pad=0,
+                initialW=initializer)
+            self.a1 = self._Activation
+            self.l2 = self._Convolution2D(
+                None, out_channels=3, ksize=(5, 5), stride=1, pad=0,
+                initialW=initializer)
+            self.a2 = self._Activation
+            self.l3 = self._Linear(None, 20, initialW=initializer)
+            self.a3 = self._Activation
+            self.lo = self._Linear(None, n_class, initialW=initializer)
+
+    def forward(self, x, t):
+        # TODO: no t prediction
+        x = self.preprocess_for_bounds(x)
+        h = self.l1(x)
+        h = self.a1(h)
+        h = self.l2(h)
+        h = self.a2(h)
+        h = self.l3(h)
+        h = self.a3(h)
+        loss = self.calculate_cross_entropy(h, t=t)
+        return loss
+
+    def forward_for_visualization_samples(self, x, t, save_path):
+        samples = collections.OrderedDict()
+        x = self.preprocess_for_bounds(x)
+        samples['x'] = cuda.to_cpu(x.array)[0]
+        samples['x.lower'] = cuda.to_cpu(x.lower.array)[0]
+        samples['x.upper'] = cuda.to_cpu(x.upper.array)[0]
+        h = self.l1(x)
+        samples['l1'] = cuda.to_cpu(h.array)[0]
+        samples['l1.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['l1.upper'] = cuda.to_cpu(h.upper.array)[0]
+        h = self.a1(h)
+        samples['a1'] = cuda.to_cpu(h.array)[0]
+        samples['a1.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['a1.upper'] = cuda.to_cpu(h.upper.array)[0]
+        h = self.l2(h)
+        samples['l2'] = cuda.to_cpu(h.array)[0]
+        samples['l2.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['l2.upper'] = cuda.to_cpu(h.upper.array)[0]
+        h = self.a2(h)
+        samples['a2'] = cuda.to_cpu(h.array)[0]
+        samples['a2.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['a2.upper'] = cuda.to_cpu(h.upper.array)[0]
+        h = self.l3(h)
+        samples['l3'] = cuda.to_cpu(h.array)[0]
+        samples['l3.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['l3.upper'] = cuda.to_cpu(h.upper.array)[0]
+        h = self.a3(h)
+        samples['a3'] = cuda.to_cpu(h.array)[0]
+        samples['a3.lower'] = cuda.to_cpu(h.lower.array)[0]
+        samples['a3.upper'] = cuda.to_cpu(h.upper.array)[0]
+
+        return samples
 
 
 class SmallCNN(VerifiableClassifier):

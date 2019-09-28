@@ -10,7 +10,7 @@ from chainer.training import extensions
 import chainerx
 
 import layers
-from models import SmallCNN, MediumCNN
+from models import SmallCNN, MediumCNN, SmallerCNN4Visualization
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     parser.add_argument('--normal-loss-weight', '--kappa', '-k',
                         type=float, default=0.5)
     parser.add_argument('--model-class', default='small',
-                        choices=['small', 'medium'])
+                        choices=['small', 'medium', 'vissmall'])
     parser.add_argument('--out', '-o', default='result',
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', type=str,
@@ -56,6 +56,7 @@ def main():
     ModelClass = {
         'small': SmallCNN,
         'medium': MediumCNN,
+        'vissmall': SmallerCNN4Visualization,
     }[args.model_class]
     if args.baseline:
         print('Baseline without verification.')
