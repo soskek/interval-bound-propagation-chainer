@@ -12,8 +12,18 @@ python train_mnist.py -d 0 --model-class small
 
 ## Visualize
 
+
+The left is by a baseline model while the right is by a IBP-trained model.
+Each shows the activation feature map of `normal`, `upper`- and `lower`-bounds at each layer.
+The image of `range` shows the `upper - normal` and `normal - lower` diffs with red and blue respectively.
+The more red, the more looser the upper bound is. The more blue, the more looser the lower bound is.
+
+We can see the IBP-trained model produces noise-robust features.
+And, its logit for classification (`y`), on the bottom, is also robust and consistently predicts 7 as the label while the baseline fails.
+
 ![visualize_baseline_and_ibp](sample_data/vis_files/visualize_comparison_ibp.png)
 
+Visualization notebook is `visualize_interval_bound_propagation.ipynb`.
 
 ## TODO?
 
