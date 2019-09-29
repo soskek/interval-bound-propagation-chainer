@@ -10,6 +10,11 @@ Authors' TensorFlow Code: [https://github.com/deepmind/interval-bound-propagatio
 python train_mnist.py -d 0 --model-class small
 ```
 
+## Visualize
+
+![visualize_baseline_and_ibp](sample_data/vis_files/visualize_comparison_ibp.png)
+
+
 ## TODO?
 
 - [Achieving Verified Robustness to Symbol Substitutions via Interval Bound Propagation, EMNLP 2019](https://arxiv.org/abs/1909.01492)
