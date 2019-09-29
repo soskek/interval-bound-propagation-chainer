@@ -43,6 +43,20 @@ def verifiable_relu(x):
     return y
 
 
+def verifiable_sigmoid(x):
+    # Standard call
+    y = F.sigmoid(x)
+    if not(hasattr(x, 'lower') and hasattr(x, 'upper')):
+        return y
+    # Call with bounds
+    y.lower, y.upper = F.sigmoid(x.lower), F.sigmoid(x.upper)
+    if _DO_TEST:
+        xp = chainer.cuda.get_array_module(x)
+        xp.testing.assert_array_less(y.lower.array, y.array + _TEST_E)
+        xp.testing.assert_array_less(y.array, y.upper.array + _TEST_E)
+    return y
+
+
 class VerifiableLinear(L.Linear):
     def __init__(self, *args, **kwargs):
         super(VerifiableLinear, self).__init__(

@@ -11,7 +11,7 @@ from chainer import training
 from chainer.training import extensions
 import chainerx
 
-from layers import verifiable_relu, VerifiableLinear, VerifiableConvolution2D
+from layers import verifiable_relu, verifiable_sigmoid, VerifiableLinear, VerifiableConvolution2D
 
 # initializer = chainer.initializers.Orthogonal(scale=1.0)
 # This doesn't work sometimes
@@ -191,6 +191,7 @@ class SmallerCNN4Visualization(VerifiableClassifier):
             n_class, verify=verify,
             warmup_steps=warmup_steps, rampup_steps=rampup_steps,
             normal_loss_weight=normal_loss_weight, epsilon=epsilon)
+        self._Activation = verifiable_sigmoid
 
         with self.init_scope():
             self.l1 = self._Convolution2D(
@@ -217,37 +218,29 @@ class SmallerCNN4Visualization(VerifiableClassifier):
         loss = self.calculate_cross_entropy(h, t=t)
         return loss
 
-    def forward_for_visualization_samples(self, x, t, save_path):
+    def forward_for_visualization_samples(self, x, t):
         samples = collections.OrderedDict()
-        x = self.preprocess_for_bounds(x)
-        samples['x'] = cuda.to_cpu(x.array)[0]
-        samples['x.lower'] = cuda.to_cpu(x.lower.array)[0]
-        samples['x.upper'] = cuda.to_cpu(x.upper.array)[0]
-        h = self.l1(x)
-        samples['l1'] = cuda.to_cpu(h.array)[0]
-        samples['l1.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['l1.upper'] = cuda.to_cpu(h.upper.array)[0]
-        h = self.a1(h)
-        samples['a1'] = cuda.to_cpu(h.array)[0]
-        samples['a1.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['a1.upper'] = cuda.to_cpu(h.upper.array)[0]
-        h = self.l2(h)
-        samples['l2'] = cuda.to_cpu(h.array)[0]
-        samples['l2.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['l2.upper'] = cuda.to_cpu(h.upper.array)[0]
-        h = self.a2(h)
-        samples['a2'] = cuda.to_cpu(h.array)[0]
-        samples['a2.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['a2.upper'] = cuda.to_cpu(h.upper.array)[0]
-        h = self.l3(h)
-        samples['l3'] = cuda.to_cpu(h.array)[0]
-        samples['l3.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['l3.upper'] = cuda.to_cpu(h.upper.array)[0]
-        h = self.a3(h)
-        samples['a3'] = cuda.to_cpu(h.array)[0]
-        samples['a3.lower'] = cuda.to_cpu(h.lower.array)[0]
-        samples['a3.upper'] = cuda.to_cpu(h.upper.array)[0]
 
+        def set_arrays(node):
+            return {'normal': cuda.to_cpu(node.array)[0],
+                    'lower': cuda.to_cpu(node.lower.array)[0],
+                    'upper': cuda.to_cpu(node.upper.array)[0]}
+        x = self.preprocess_for_bounds(x)
+        samples['x'] = set_arrays(x)
+        h = self.l1(x)
+        samples['l1'] = set_arrays(h)
+        h = self.a1(h)
+        samples['a1'] = set_arrays(h)
+        h = self.l2(h)
+        samples['l2'] = set_arrays(h)
+        h = self.a2(h)
+        samples['a2'] = set_arrays(h)
+        h = self.l3(h)
+        samples['l3'] = set_arrays(h)
+        h = self.a3(h)
+        samples['a3'] = set_arrays(h)
+        y = self.lo(h)
+        samples['y'] = set_arrays(y)
         return samples
 
 
