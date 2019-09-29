@@ -1,6 +1,6 @@
 # Interval Bound Propagation
 
-The MNIST experiment with small or medium models is implemented.
+This is Chainer easy-to-follow implementation of Interval Bound Propagation. The MNIST experiment with small or medium models is implemented.
 
 Paper: Sven Gowal, Krishnamurthy Dvijotham, Robert Stanforth, Rudy Bunel, Chongli Qin, Jonathan Uesato, Relja Arandjelovic, Timothy Mann, Pushmeet Kohli, [On the Effectiveness of Interval Bound Propagation for Training Verifiably Robust Models (Scalable Verified Training for Provably Robust Image Classification), ICCV 2019](https://arxiv.org/abs/1810.12715)
 
@@ -9,6 +9,9 @@ Authors' TensorFlow Code: [https://github.com/deepmind/interval-bound-propagatio
 ```
 python train_mnist.py -d 0 --model-class small
 ```
+
+See `layers.py` or `models.py` for understanding the core of the algorithm.
+
 
 ## Visualize
 
