@@ -15,6 +15,7 @@ See `layers.py` or `models.py` for understanding the core of the algorithm.
 
 ## Visualize
 
+![visualization of interval bound propagation CNN filters](sample_data/vis_files/visualize_comparison_ibp.png)
 
 The left is by a baseline model while the right is by a IBP-trained model.
 Each shows the activation feature map of `normal`, `upper`- and `lower`-bounds at each layer.
@@ -23,8 +24,6 @@ The more red, the more looser the upper bound is. The more blue, the more looser
 
 We can see the IBP-trained model produces noise-robust features.
 And, its logit for classification (`y`), on the bottom, is also robust and consistently predicts 7 as the label while the baseline fails.
-
-![visualization of interval bound propagation CNN filters](sample_data/vis_files/visualize_comparison_ibp.png)
 
 Visualization notebook is `visualize_interval_bound_propagation.ipynb`.
 
