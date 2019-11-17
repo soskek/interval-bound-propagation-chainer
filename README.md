@@ -26,7 +26,3 @@ We can see the IBP-trained model produces noise-robust features.
 And, its logit for classification (`y`), on the bottom, is also robust and consistently predicts 7 as the label while the baseline fails.
 
 Visualization notebook is `visualize_interval_bound_propagation.ipynb`.
-
-## TODO?
-
-- [Achieving Verified Robustness to Symbol Substitutions via Interval Bound Propagation, EMNLP 2019](https://arxiv.org/abs/1909.01492)
