@@ -24,7 +24,7 @@ The more red, the more looser the upper bound is. The more blue, the more looser
 We can see the IBP-trained model produces noise-robust features.
 And, its logit for classification (`y`), on the bottom, is also robust and consistently predicts 7 as the label while the baseline fails.
 
-![visualize_baseline_and_ibp](sample_data/vis_files/visualize_comparison_ibp.png)
+![visualization of interval bound propagation CNN filters](sample_data/vis_files/visualize_comparison_ibp.png)
 
 Visualization notebook is `visualize_interval_bound_propagation.ipynb`.
 
